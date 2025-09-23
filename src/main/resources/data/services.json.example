@@ -1,0 +1,177 @@
+[
+  {
+    "Date": "9/7/2025",
+    "Customer": "Sunset Apartments",
+    "Crew": "Samantha B., Diego M.",
+    "WorkPerformed": "Documented damage for insurance",
+    "Need": "Scope needs revision"
+  },
+  {
+    "Date": "9/6/2025",
+    "Customer": "John Doe",
+    "Crew": "Diego M., Mike R.",
+    "WorkPerformed": "Set up drying equipment",
+    "Need": "Scope needs revision"
+  },
+  {
+    "Date": "9/11/2025",
+    "Customer": "Maple Street Church",
+    "Crew": "Samantha B., Diego M., Alex G.",
+    "WorkPerformed": "Applied antimicrobial spray",
+    "Need": "Upload photos"
+  },
+  {
+    "Date": "9/6/2025",
+    "Customer": "Maple Street Church",
+    "Crew": "Chris W., Tasha L., Mike R.",
+    "WorkPerformed": "Monitored moisture levels",
+    "Need": "Scope needs revision"
+  },
+  {
+    "Date": "9/11/2025",
+    "Customer": "Maple Street Church",
+    "Crew": "Mike R., Chris W.",
+    "WorkPerformed": "Set up drying equipment",
+    "Need": "Scope needs revision"
+  },
+  {
+    "Date": "9/6/2025",
+    "Customer": "Jane Smith",
+    "Crew": "Laura H., Diego M., Tasha L.",
+    "WorkPerformed": "Removed wet carpet and pad",
+    "Need": "Customer signature needed"
+  },
+  {
+    "Date": "9/10/2025",
+    "Customer": "Jane Smith",
+    "Crew": "Laura H., Samantha B.",
+    "WorkPerformed": "Tear-out of drywall",
+    "Need": "Done"
+  },
+  {
+    "Date": "9/9/2025",
+    "Customer": "Jane Smith",
+    "Crew": "Samantha B., Mike R., Alex G.",
+    "WorkPerformed": "Set up drying equipment",
+    "Need": "Done"
+  },
+  {
+    "Date": "9/3/2025",
+    "Customer": "John Doe",
+    "Crew": "Laura H., Diego M., Tasha L.",
+    "WorkPerformed": "Removed wet carpet and pad",
+    "Need": "Scope needs revision"
+  },
+  {
+    "Date": "9/4/2025",
+    "Customer": "Maple Street Church",
+    "Crew": "Tasha L., Alex G., Laura H.",
+    "WorkPerformed": "Extracted standing water",
+    "Need": "Customer signature needed"
+  },
+  {
+    "Date": "9/10/2025",
+    "Customer": "Sunset Apartments",
+    "Crew": "Chris W., Diego M.",
+    "WorkPerformed": "Removed wet carpet and pad",
+    "Need": "Upload photos"
+  },
+  {
+    "Date": "9/1/2025",
+    "Customer": "John Doe",
+    "Crew": "Chris W., Alex G.",
+    "WorkPerformed": "Set up drying equipment",
+    "Need": "Upload photos"
+  },
+  {
+    "Date": "9/4/2025",
+    "Customer": "Lakeside Dental",
+    "Crew": "Alex G., Laura H., Tasha L.",
+    "WorkPerformed": "Applied antimicrobial spray",
+    "Need": "Customer signature needed"
+  },
+  {
+    "Date": "9/4/2025",
+    "Customer": "Maple Street Church",
+    "Crew": "Diego M., Samantha B., Alex G.",
+    "WorkPerformed": "Documented damage for insurance",
+    "Need": "Pick up equipment"
+  },
+  {
+    "Date": "9/3/2025",
+    "Customer": "Maple Street Church",
+    "Crew": "Tasha L., Diego M.",
+    "WorkPerformed": "Applied antimicrobial spray",
+    "Need": "Scope needs revision"
+  },
+  {
+    "Date": "9/6/2025",
+    "Customer": "John Doe",
+    "Crew": "Alex G., Tasha L., Samantha B.",
+    "WorkPerformed": "Tear-out of drywall",
+    "Need": "Scope needs revision"
+  },
+  {
+    "Date": "9/3/2025",
+    "Customer": "Jane Smith",
+    "Crew": "Chris W., Mike R., Alex G.",
+    "WorkPerformed": "Applied antimicrobial spray",
+    "Need": "Scope needs revision"
+  },
+  {
+    "Date": "9/4/2025",
+    "Customer": "Lakeside Dental",
+    "Crew": "Chris W., Mike R., Diego M.",
+    "WorkPerformed": "Applied antimicrobial spray",
+    "Need": "Customer signature needed"
+  },
+  {
+    "Date": "9/11/2025",
+    "Customer": "Lakeside Dental",
+    "Crew": "Tasha L., Samantha B., Mike R.",
+    "WorkPerformed": "Set up drying equipment",
+    "Need": "Done"
+  },
+  {
+    "Date": "9/7/2025",
+    "Customer": "Sunset Apartments",
+    "Crew": "Tasha L., Diego M., Laura H.",
+    "WorkPerformed": "Set up drying equipment",
+    "Need": "Scope needs revision"
+  },
+  {
+    "Date": "9/3/2025",
+    "Customer": "Lakeside Dental",
+    "Crew": "Chris W., Samantha B., Diego M.",
+    "WorkPerformed": "Removed wet carpet and pad",
+    "Need": "Scope needs revision"
+  },
+  {
+    "Date": "9/11/2025",
+    "Customer": "John Doe",
+    "Crew": "Samantha B., Diego M., Tasha L.",
+    "WorkPerformed": "Set up drying equipment",
+    "Need": "Done"
+  },
+  {
+    "Date": "9/4/2025",
+    "Customer": "John Doe",
+    "Crew": "Diego M., Laura H.",
+    "WorkPerformed": "Set up drying equipment",
+    "Need": "Pick up equipment"
+  },
+  {
+    "Date": "9/3/2025",
+    "Customer": "Maple Street Church",
+    "Crew": "Laura H., Samantha B., Diego M.",
+    "WorkPerformed": "Final cleaning and walkthrough",
+    "Need": "Customer signature needed"
+  },
+  {
+    "Date": "9/7/2025",
+    "Customer": "Jane Smith",
+    "Crew": "Samantha B., Alex G., Laura H.",
+    "WorkPerformed": "Applied antimicrobial spray",
+    "Need": "Done"
+  }
+]

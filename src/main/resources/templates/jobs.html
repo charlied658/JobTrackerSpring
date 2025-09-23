@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Service Tracker</title>
+</head>
+<body>
+<h1>All Jobs</h1>
+<ul>
+    <li th:each="job : ${jobs}">
+        <strong th:text="${job.jobNumber}">Job Number</strong><br/>
+        <span th:text="${job.customer}">Customer</span><br/>
+        <span th:text="${job.status}">Status</span><br/>
+        <em>Services:</em>
+        <ul>
+            <li th:each="service : ${job.services}">
+                <span th:text="${service.date}">Date</span> –
+                <span th:text="${service.workPerformed}">Work</span>
+                (<span th:text="${service.need}">Need</span>)
+            </li>
+        </ul>
+    </li>
+</ul>
+</body>
+</html>
