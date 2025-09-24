@@ -2,13 +2,14 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Service Tracker</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
 <h1>All Jobs</h1>
 <ul>
     <li th:each="job : ${jobs}">
         <strong th:text="${job.jobNumber}">Job Number</strong><br/>
-        <span th:text="${job.customer}">Customer</span><br/>
+        <a th:href="@{/jobs/{id}(id=${job.id})}" th:text="${job.customer}">Customer</a>
         <span th:text="${job.status}">Status</span><br/>
         <em>Services:</em>
         <ul>

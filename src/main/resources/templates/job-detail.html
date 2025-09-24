@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="'Job ' + ${job.jobNumber}">Job Detail</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<h1 th:text="'Job ' + ${job.jobNumber} + ' – ' + ${job.customer}">Job Info</h1>
+<p><strong>Status:</strong> <span th:text="${job.status}"></span></p>
+<p><strong>Address:</strong> <span th:text="${job.address}"></span></p>
+
+<h2>Service Entries</h2>
+<ul>
+    <li th:each="service : ${job.services}">
+        <strong th:text="${#temporals.format(service.date, 'MM/dd/yyyy')}">Date</strong> –
+        <span th:text="${service.crew}">Crew</span> –
+        <span th:text="${service.workPerformed}">Work</span> →
+        <em th:text="${service.need}">Need</em>
+    </li>
+</ul>
+
+<a href="/view/jobs">← Back to All Jobs</a>
+</body>
+</html>

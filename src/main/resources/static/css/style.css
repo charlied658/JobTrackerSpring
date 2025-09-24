@@ -1,0 +1,36 @@
+body {
+    font-family: sans-serif;
+    background-color: #f8f9fa;
+    padding: 2rem;
+    line-height: 1.6;
+}
+
+h1, h2 {
+    color: #003366;
+}
+
+a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+li {
+    background: white;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+strong {
+    color: #222;
+}
