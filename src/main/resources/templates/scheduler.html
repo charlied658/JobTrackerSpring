@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Scheduler View</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .card h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1rem;
+        }
+
+        .card a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .card a:hover {
+            text-decoration: underline;
+        }
+
+        h2 {
+            margin-top: 2rem;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 0.3rem;
+        }
+    </style>
+</head>
+<body>
+
+<nav style="margin-bottom: 20px;">
+    <a href="/view/jobs">📋 Jobs by Customer</a> |
+    <span style="color: gray;">📅 Calendar View</span>
+</nav>
+
+<h1>📅 Services by Date</h1>
+
+<!-- Grouped by date -->
+<div th:each="entry : ${groupedServices}">
+    <h2 th:text="${#temporals.format(entry.key, 'MM/dd/yyyy')}">Date</h2>
+
+    <div class="grid">
+        <!-- Each service entry becomes a tile -->
+        <div class="card" th:each="service : ${entry.value}">
+            <h3>
+                <a th:href="@{/jobs/{id}(id=${service.job.id})}"
+                   th:text="${service.job.customer}">
+                    Customer Name
+                </a>
+            </h3>
+            <p><strong>Crew:</strong> <span th:text="${service.crew}">Crew</span></p>
+            <p><strong>Work:</strong> <span th:text="${service.workPerformed}">Work</span></p>
+            <p><strong>Need:</strong> <em th:text="${service.need}">Need</em></p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

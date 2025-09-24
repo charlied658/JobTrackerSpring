@@ -1,22 +1,45 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Service Tracker</title>
+    <title>All Jobs</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:inline="javascript">
+        function toggleServices(jobId) {
+            const section = document.getElementById("services-" + jobId);
+            const btn = document.getElementById("toggle-btn-" + jobId);
+            if (section.style.display === "none") {
+                section.style.display = "block";
+                btn.textContent = "Hide Services ▲";
+            } else {
+                section.style.display = "none";
+                btn.textContent = "Show Services ▼";
+            }
+        }
+    </script>
 </head>
+<nav style="margin-bottom: 20px;">
+    <span style="color: gray;">📋 Jobs by Customer</span> |
+    <a href="/view/scheduler">📅 Calendar View</a>
+</nav>
 <body>
 <h1>All Jobs</h1>
 <ul>
     <li th:each="job : ${jobs}">
-        <strong th:text="${job.jobNumber}">Job Number</strong><br/>
-        <a th:href="@{/jobs/{id}(id=${job.id})}" th:text="${job.customer}">Customer</a>
-        <span th:text="${job.status}">Status</span><br/>
-        <em>Services:</em>
-        <ul>
+        <div>
+            <strong th:text="${job.jobNumber}">Job Number</strong> –
+            <a th:href="@{/jobs/{id}(id=${job.id})}" th:text="${job.customer}">Customer</a>
+            <button
+                    th:id="'toggle-btn-' + ${job.id}"
+                    th:onclick="'toggleServices(' + ${job.id} + ')'">
+                Show Services ▼
+            </button>
+        </div>
+
+        <ul th:id="'services-' + ${job.id}" style="display: none;">
             <li th:each="service : ${job.services}">
-                <span th:text="${service.date}">Date</span> –
-                <span th:text="${service.workPerformed}">Work</span>
-                (<span th:text="${service.need}">Need</span>)
+                <span th:text="${#temporals.format(service.date, 'MM/dd/yyyy')}">Date</span> –
+                <span th:text="${service.workPerformed}">Work</span> →
+                <em th:text="${service.need}">Need</em>
             </li>
         </ul>
     </li>

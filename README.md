@@ -12,7 +12,7 @@ The program reads from a file called `servicelog.json` in `src/main/resources/da
 - [X] Initialize Project
 - [X] Create page for all active Jobs/Customers
 - [X] Create page for each Customer
+- [X] Create schedule/calendar view to see services by date
 - [ ] Allow users to edit Customer information
 - [ ] Allow users to edit/add new services for a Customer
 - [ ] Connect data to FireStoreDB to synchronize data across instances
-- [ ] Create schedule/calendar view to see services by date

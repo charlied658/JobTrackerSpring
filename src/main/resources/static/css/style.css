@@ -34,3 +34,10 @@ li {
 strong {
     color: #222;
 }
+
+button {
+    margin-left: 10px;
+    padding: 4px 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
