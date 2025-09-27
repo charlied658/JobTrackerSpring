@@ -5,12 +5,17 @@ import org.example.jobtrackerspring.model.ServiceEntry;
 import org.example.jobtrackerspring.repository.JobRepository;
 import org.example.jobtrackerspring.repository.ServiceEntryRepository;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,9 +31,19 @@ public class ViewController {
     }
 
     @GetMapping("/view/jobs")
-    public String viewJobs(Model model) {
-        model.addAttribute("jobs", jobRepo.findAll());
-        return "jobs"; // resolves to templates/jobs.html
+    public String viewJobs(@RequestParam(required = false) String search, Model model) {
+        List<Job> jobs;
+
+        if (search != null && !search.isEmpty()) {
+            jobs = jobRepo.findByCustomerContainingIgnoreCase(search);
+        } else {
+            jobs = jobRepo.findAll();
+        }
+
+        model.addAttribute("jobs", jobs);
+        model.addAttribute("search", search); // to keep value in form
+        model.addAttribute("currentPage", "jobs");
+        return "jobs";
     }
 
     @GetMapping("/jobs/{id}")
@@ -43,20 +58,77 @@ public class ViewController {
     }
 
     @GetMapping("/view/scheduler")
-    public String viewScheduler(Model model) {
-        List<ServiceEntry> allServices = serviceRepo.findAll();
+    public String viewScheduler(@RequestParam(required = false)
+                                @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                                LocalDate date,
+                                Model model) {
+        LocalDate selectedDate = (date != null) ? date : LocalDate.now();
+        List<Job> allJobs = jobRepo.findAll();
 
-        // Group services by date (LocalDate only, no time)
-        Map<LocalDate, List<ServiceEntry>> groupedByDate = allServices.stream()
-                .collect(Collectors.groupingBy(ServiceEntry::getDate));
+        List<ServiceEntry> servicesForDate = serviceRepo.findAll().stream()
+                .filter(s -> selectedDate.equals(s.getDate()))
+                .collect(Collectors.toList());
 
-        // Sort by most recent date first
-        Map<LocalDate, List<ServiceEntry>> sortedByDateDesc = new TreeMap<>(Comparator.reverseOrder());
-        sortedByDateDesc.putAll(groupedByDate);
-
-        model.addAttribute("groupedServices", sortedByDateDesc);
+        model.addAttribute("selectedDate", selectedDate);
+        model.addAttribute("services", servicesForDate);
         model.addAttribute("currentPage", "scheduler");
+        model.addAttribute("allJobs", allJobs);
 
         return "scheduler";
+    }
+
+    @PostMapping("/services/add")
+    public String addService(@RequestParam Long jobId,
+                             @RequestParam String crew,
+                             @RequestParam String workPerformed,
+                             @RequestParam String need,
+                             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
+
+        Job job = jobRepo.findById(jobId).orElse(null);
+        if (job == null) {
+            // Handle error (redirect with error message or log it)
+            return "redirect:/view/scheduler?date=" + new SimpleDateFormat("yyyy-MM-dd").format(date);
+        }
+
+        LocalDate localDate = date.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+        ServiceEntry service = new ServiceEntry();
+        service.setJob(job);
+        service.setCrew(crew);
+        service.setWorkPerformed(workPerformed);
+        service.setNeed(need);
+        service.setDate(localDate);
+        serviceRepo.save(service);
+
+        String formatted = new SimpleDateFormat("yyyy-MM-dd").format(date);
+        return "redirect:/view/scheduler?date=" + formatted;
+    }
+
+    @PostMapping("/services/update")
+    public String updateService(@RequestParam Long id,
+                                @RequestParam String date,
+                                @RequestParam String crew,
+                                @RequestParam String workPerformed,
+                                @RequestParam String need) {
+
+        Optional<ServiceEntry> optional = serviceRepo.findById(id);
+        if (optional.isPresent()) {
+            ServiceEntry service = optional.get();
+            service.setCrew(crew);
+            service.setWorkPerformed(workPerformed);
+            service.setNeed(need);
+            serviceRepo.save(service);
+        }
+
+        // Redirect back to scheduler with same date if you want
+        return "redirect:/view/scheduler?date=" + date;
+    }
+
+    @PostMapping("/services/delete")
+    public String deleteService(@RequestParam Long id,
+                                @RequestParam String date) {
+        serviceRepo.deleteById(id);
+        return "redirect:/view/scheduler?date=" + date;
     }
 }
