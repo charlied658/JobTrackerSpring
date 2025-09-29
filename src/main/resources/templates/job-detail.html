@@ -1,23 +1,132 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title th:text="'Job ' + ${job.jobNumber}">Job Detail</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <meta charset="UTF-8">
+    <title th:text="${job.lossType}">Job Detail</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
 </head>
 <body>
-<h1 th:text="'Job ' + ${job.jobNumber} + ' – ' + ${job.customer}">Job Info</h1>
-<p><strong>Status:</strong> <span th:text="${job.status}"></span></p>
-<p><strong>Address:</strong> <span th:text="${job.address}"></span></p>
 
-<h2>Service Entries</h2>
-<ul>
-    <li th:each="service : ${job.services}">
-        <strong th:text="${#temporals.format(service.date, 'MM/dd/yyyy')}">Date</strong> –
-        <span th:text="${service.crew}">Crew</span> –
-        <span th:text="${service.workPerformed}">Work</span> →
-        <em th:text="${service.need}">Need</em>
-    </li>
-</ul>
+<nav style="margin-bottom: 20px;">
+    <a href="/view/customers">Customers</a> |
+    <a href="/view/jobs">Jobs</a> |
+    <a href="/view/services">Services</a>
 
+    <br><a th:text="${job.customer.name}" th:href="@{/view/customers/{id}(id=${job.customer.id})}"></a> →
+    <span th:text="${job.lossType}">Loss Type</span>
+</nav>
+
+<div class="container">
+    <h1 th:text="${job.lossType}">Loss Type</h1>
+    <p><strong>Customer:</strong> <span th:text="${job.customer.name}"></span></p>
+    <p><strong>Status:</strong> <span th:text="${job.status}"></span></p>
+    <p><strong>Address:</strong> <span th:text="${job.address}"></span></p>
+    <p><strong>Description:</strong> <span th:text="${job.description}"></span></p>
+
+    <!-- Edit Job Button -->
+    <button onclick="openEditJobModal()" class="edit-button">Edit Job</button>
+
+    <h2>Services</h2>
+
+    <a class ="box-link" onclick = "openAddServiceModal()">
+        <div class = "add-clickable-box">
+            <div class="circle-plus">+</div>
+            <span>Add Service</span>
+        </div>
+    </a>
+
+    <div class="service-list">
+        <section class="service-tile" th:each="service : ${job.services}">
+            <a th:href="@{/view/services/{id}(id=${service.id})}" class="box-link">
+                <div class = "clickable-box">
+                    <p><strong>Date:</strong> <span th:text="${service.date}">Date</span></p>
+                    <p><strong>Service Type:</strong> <span th:text="${service.serviceType}">Date</span></p>
+                    <p><strong>Crew:</strong> <span th:text="${service.crew}">Crew</span></p>
+                    <p><strong>Instructions:</strong> <span th:text="${service.instructions}">Crew</span></p>
+                    <p><strong>Work Performed:</strong> <span th:text="${service.workPerformed}">Work</span></p>
+                    <p><strong>Need:</strong> <span th:text="${service.need}">Need</span></p>
+                </div>
+            </a>
+        </section>
+    </div>
+</div>
 </body>
+
+<!-- Add Service Modal -->
+<div id="addServiceModalOverlay" class="modal-overlay" style="display:none;">
+    <div class="modal">
+        <button class="close-button" onclick="closeAddServiceModal()">✖</button>
+        <h2>Add Service</h2>
+        <form method="post" th:action="@{/services/add}">
+            <input type="hidden" name="jobId" th:value="${job.id}" />
+
+            <label for="date">Date:</label><br>
+            <input type="date" id="date" name="date" required><br><br>
+
+            <label for="crew">Crew:</label><br>
+            <input type="text" id="crew" name="crew"><br><br>
+
+            <label for="serviceType">Service Type:</label><br>
+            <input type="text" id="serviceType" name="serviceType"><br><br>
+
+            <label for="instructions">Instructions:</label><br>
+            <input type="text" id="instructions" name="instructions"><br><br>
+
+            <label for="workPerformed">Work Performed:</label><br>
+            <textarea id="workPerformed" name="workPerformed" rows="3"></textarea><br><br>
+
+            <label for="need">Need:</label><br>
+            <textarea id="need" name="need" rows="3"></textarea><br><br>
+
+            <button type="submit" class="save-button">💾 Save</button>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Job Modal -->
+<div id="editJobModalOverlay" class="modal-overlay" style="display: none;">
+    <div class="modal">
+        <button class="close-button" onclick="closeEditJobModal()">✖</button>
+        <h2>Edit Job</h2>
+        <form th:action="@{/jobs/edit}" method="post">
+            <input type="hidden" name="id" th:value="${job.id}" />
+
+            <label for="editJobLossType">Loss Type:</label><br>
+            <input type="text" id="editJobLossType" name="lossType" th:value="${job.lossType}" required /><br><br>
+
+            <label for="editJobStatus">Status:</label><br>
+            <input type="text" id="editJobStatus" name="status" th:value="${job.status}" /><br><br>
+
+            <label for="editJobAddress">Address:</label><br>
+            <input type="text" id="editJobAddress" name="address" th:value="${job.address}" /><br><br>
+
+            <label for="editJobDescription">Description:</label><br>
+            <input type="text" id="editJobDescription" name="description" th:value="${job.description}" /><br><br>
+
+            <div class="modal-actions">
+                <button type="submit" class="save-button">💾 Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openAddServiceModal() {
+        document.getElementById('addServiceModalOverlay').style.display = 'flex';
+    }
+
+    function closeAddServiceModal() {
+        document.getElementById('addServiceModalOverlay').style.display = 'none';
+    }
+
+    function openEditJobModal() {
+        document.getElementById('editJobModalOverlay').style.display = 'flex';
+    }
+
+    function closeEditJobModal() {
+        document.getElementById('editJobModalOverlay').style.display = 'none';
+    }
+</script>
+
+
 </html>

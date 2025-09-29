@@ -2,19 +2,21 @@ package org.example.jobtrackerspring.model;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 public class Job {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue
     private Long id;
-
-    private String jobNumber;  // e.g. "23-1842"
-    private String customer;
-    private String address;
+    private String lossType;
     private String status;
+    private String address;
+    private String description;
+
+    @ManyToOne
+    private Customer customer;
 
     @OneToMany(mappedBy = "job", cascade = CascadeType.ALL)
     private List<ServiceEntry> services = new ArrayList<>();
@@ -27,28 +29,12 @@ public class Job {
         this.id = id;
     }
 
-    public String getJobNumber() {
-        return jobNumber;
+    public String getLossType() {
+        return lossType;
     }
 
-    public void setJobNumber(String jobNumber) {
-        this.jobNumber = jobNumber;
-    }
-
-    public String getCustomer() {
-        return customer;
-    }
-
-    public void setCustomer(String customer) {
-        this.customer = customer;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
+    public void setLossType(String lossType) {
+        this.lossType = lossType;
     }
 
     public String getStatus() {
@@ -59,11 +45,42 @@ public class Job {
         this.status = status;
     }
 
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
     public List<ServiceEntry> getServices() {
         return services;
     }
 
     public void setServices(List<ServiceEntry> services) {
         this.services = services;
+    }
+
+    public LocalDate getLatestServiceDate() {
+        return services.stream()
+                .map(ServiceEntry::getDate)
+                .max(LocalDate::compareTo)
+                .orElse(null);
     }
 }

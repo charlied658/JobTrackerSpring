@@ -6,20 +6,16 @@ import java.time.LocalDate;
 
 @Entity
 public class ServiceEntry {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue
     private Long id;
-
     private LocalDate date;
     private String crew;
-
-    @Column(name = "workPerformed")
+    private String serviceType;
+    private String instructions;
     private String workPerformed;
-
     private String need;
 
     @ManyToOne
-    @JoinColumn(name = "jobId")
     private Job job;
 
     public Long getId() {
@@ -44,6 +40,22 @@ public class ServiceEntry {
 
     public void setCrew(String crew) {
         this.crew = crew;
+    }
+
+    public String getServiceType() {
+        return serviceType;
+    }
+
+    public void setServiceType(String serviceType) {
+        this.serviceType = serviceType;
+    }
+
+    public String getInstructions() {
+        return instructions;
+    }
+
+    public void setInstructions(String instructions) {
+        this.instructions = instructions;
     }
 
     public String getWorkPerformed() {

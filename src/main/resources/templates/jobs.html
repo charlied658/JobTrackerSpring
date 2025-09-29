@@ -1,29 +1,35 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
     <title>All Jobs</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
 </head>
-<nav style="margin-bottom: 20px;">
-    <span style="color: gray;">📋 Jobs by Customer</span> |
-    <a href="/view/scheduler">📅 Calendar View</a>
-</nav>
 <body>
-<h1>All Jobs</h1>
-<form method="get" action="/view/jobs" style="margin-bottom: 1rem;">
-    <input type="text" name="search"
-           placeholder="Search by customer..."
-           th:value="${search}"
-           style="padding: 6px; width: 250px; border-radius: 4px; border: 1px solid #ccc;">
-    <button type="submit" style="padding: 6px 12px;">Search</button>
-</form>
-<ul>
-    <li th:each="job : ${jobs}">
-        <div>
-            <strong th:text="${job.jobNumber}">Job Number</strong> –
-            <a th:href="@{/jobs/{id}(id=${job.id})}" th:text="${job.customer}">Customer</a>
-        </div>
-    </li>
-</ul>
+<div class="container">
+    <nav style="margin-bottom: 20px;">
+        <a href="/view/customers">Customers</a> |
+        <span style="color: gray;">Jobs</span> |
+        <a href="/view/services">Services</a>
+    </nav>
+
+    <div th:if="${jobs.isEmpty()}">
+        <p>No jobs found.</p>
+    </div>
+
+    <div class="job-list">
+        <section class="job-box" th:each="job : ${jobs}">
+            <a th:href="@{/view/jobs/{id}(id=${job.id})}" class="box-link">
+                <div class = "clickable-box">
+                    <h2 th:text="${job.lossType}">Job Description</h2>
+                    <p><strong>Customer:</strong> <span th:text="${job.customer.name}"></span></p>
+                    <p><strong>Status:</strong> <span th:text="${job.status}"></span></p>
+                    <p><strong>Last Service Date:</strong> <span th:text="${job.latestServiceDate}"></span></p>
+                </div>
+            </a>
+        </section>
+    </div>
+
+</div>
 </body>
 </html>

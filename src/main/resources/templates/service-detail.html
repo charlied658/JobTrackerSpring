@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${service.date}">Service Detail</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+
+<nav style="margin-bottom: 20px;">
+    <a href="/view/customers">Customers</a> |
+    <a href="/view/jobs">Jobs</a> |
+    <a href="/view/services">Services</a>
+
+    <br><a th:text="${service.job.customer.name}" th:href="@{/view/customers/{id}(id=${service.job.customer.id})}"></a> →
+    <a th:text="${service.job.lossType}" th:href="@{/view/jobs/{id}(id=${service.job.id})}"></a> →
+    <span th:text="${service.date}"></span>
+</nav>
+
+<div class="container">
+    <h1 th:text="${service.date}">Date</h1>
+
+    <p><strong>Customer:</strong> <span th:text="${service.job.customer.name}"></span></p>
+    <p><strong>Loss Type:</strong> <span th:text="${service.job.lossType}"></span></p>
+    <p><strong>Service Type:</strong> <span th:text="${service.serviceType}"></span></p>
+
+    <p><strong>Crew:</strong> <span th:text="${service.crew}">Crew</span></p>
+    <p><strong>Instructions:</strong> <span th:text="${service.instructions}">Crew</span></p>
+    <p><strong>Work Performed:</strong> <span th:text="${service.workPerformed}">Work Performed</span></p>
+    <p><strong>Need:</strong> <span th:text="${service.need}">Need</span></p>
+    <p><strong>Job:</strong> <span th:text="${service.job.description}">Job Description</span></p>
+
+    <!-- Edit Service Button -->
+    <button onclick="openEditServiceModal()" class="edit-button">Edit Service</button>
+
+</div>
+</body>
+
+<!-- Edit Service Modal -->
+<div id="editServiceModalOverlay" class="modal-overlay" style="display: none;">
+    <div class="modal">
+        <button class="close-button" onclick="closeEditServiceModal()">✖</button>
+        <h2>Edit Service</h2>
+
+        <form th:action="@{/services/edit}" method="post">
+            <input type="hidden" id="editServiceId" name="id" th:value="${service.id}" />
+
+            <label for="editDate">Date:</label><br>
+            <input type="date" id="editDate" name="date" th:value="${service.date}" /><br><br>
+
+            <label for="editCrew">Crew:</label><br>
+            <input type="text" id="editCrew" name="crew" th:value="${service.crew}" /><br><br>
+
+            <label for="editServiceType">Service Type:</label><br>
+            <input type="text" id="editServiceType" th:value="${service.serviceType}" /><br><br>
+
+            <label for="editInstructions">Need:</label><br>
+            <textarea id="editInstructions" name="instructions" th:value="${service.instructions}"></textarea><br><br>
+
+            <label for="editWork">Work Performed:</label><br>
+            <textarea id="editWork" name="workPerformed" th:value="${service.workPerformed}" ></textarea><br><br>
+
+            <label for="editNeed">Need:</label><br>
+            <textarea id="editNeed" name="need" th:value="${service.need}"></textarea><br><br>
+
+            <div class="modal-actions">
+                <button type="submit" class="save-button">💾 Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openEditServiceModal() {
+        document.getElementById('editServiceModalOverlay').style.display = 'flex';
+    }
+
+    function closeEditServiceModal() {
+        document.getElementById('editServiceModalOverlay').style.display = 'none';
+    }
+</script>
+
+</html>

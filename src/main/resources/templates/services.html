@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>All Services</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+<div class="container">
+
+    <nav style="margin-bottom: 20px;">
+        <a href="/view/customers">Customers</a> |
+        <a href="/view/jobs">Jobs</a> |
+        <span style="color: gray;">Services</span>
+    </nav>
+
+    <div th:if="${groupedServices.isEmpty()}">
+        <p>No services found.</p>
+    </div>
+
+    <div th:each="entry : ${groupedServices}">
+        <h2 th:text="${#temporals.format(entry.key, 'MMMM d, yyyy')}">Date</h2>
+        <div class="service-list">
+            <section class="service-box" th:each="service : ${entry.value}">
+                <a th:href="@{/view/services/{id}(id=${service.id})}" class="box-link">
+                    <div class = "clickable-box">
+                        <p><strong>Customer:</strong> <span th:text="${service.job.customer.name}">Customer</span></p>
+                        <p><strong>Loss Type:</strong> <span th:text="${service.job.lossType}"></span></p>
+                        <p><strong>Service Type:</strong> <span th:text="${service.serviceType}"></span></p>
+                        <p><strong>Crew:</strong> <span th:text="${service.crew}">Crew</span></p>
+                        <p><strong>Instructions:</strong> <span th:text="${service.instructions}"></span></p>
+                        <p><strong>Work Performed:</strong> <span th:text="${service.workPerformed}">Work</span></p>
+                        <p><strong>Need:</strong> <span th:text="${service.need}">Need</span></p>
+                    </div>
+                </a>
+            </section>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

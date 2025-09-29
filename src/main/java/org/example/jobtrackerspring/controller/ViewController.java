@@ -1,134 +1,91 @@
 package org.example.jobtrackerspring.controller;
 
+import org.example.jobtrackerspring.model.Customer;
 import org.example.jobtrackerspring.model.Job;
 import org.example.jobtrackerspring.model.ServiceEntry;
+import org.example.jobtrackerspring.repository.CustomerRepository;
 import org.example.jobtrackerspring.repository.JobRepository;
 import org.example.jobtrackerspring.repository.ServiceEntryRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
+@RequestMapping("/view")
 public class ViewController {
 
-    private final JobRepository jobRepo;
-    private final ServiceEntryRepository serviceRepo;
+    @Autowired
+    private CustomerRepository customerRepo;
 
-    public ViewController(JobRepository jobRepo, ServiceEntryRepository serviceRepo) {
-        this.jobRepo = jobRepo;
-        this.serviceRepo = serviceRepo;
+    @Autowired
+    private JobRepository jobRepo;
+
+    @Autowired
+    private ServiceEntryRepository serviceRepo;
+
+    // 📋 View all customers as a simple list with search
+    @GetMapping("/customers")
+    public String viewCustomers(Model model) {
+        List<Customer> customers = customerRepo.findAll();
+        model.addAttribute("customers", customers);
+        return "customers"; // thymeleaf template: customer_list.html
     }
 
-    @GetMapping("/view/jobs")
-    public String viewJobs(@RequestParam(required = false) String search, Model model) {
-        List<Job> jobs;
-
-        if (search != null && !search.isEmpty()) {
-            jobs = jobRepo.findByCustomerContainingIgnoreCase(search);
+    @GetMapping("/customers/{id}")
+    public String viewCustomerDetails(@PathVariable Long id, Model model) {
+        Optional<Customer> customerOpt = customerRepo.findById(id);
+        if (customerOpt.isPresent()) {
+            Customer customer = customerOpt.get();
+            model.addAttribute("customer", customer);
+            model.addAttribute("jobs", jobRepo.findByCustomer(customer));
+            return "customer-detail";  // This will be the name of the new HTML file
         } else {
-            jobs = jobRepo.findAll();
+            return "redirect:/view/customers"; // Fallback if not found
         }
+    }
 
+    @GetMapping("/jobs")
+    public String viewJobs(Model model) {
+        List<Job> jobs = jobRepo.findAll();
         model.addAttribute("jobs", jobs);
-        model.addAttribute("search", search); // to keep value in form
-        model.addAttribute("currentPage", "jobs");
-        return "jobs";
+        return "jobs"; // This matches the name of the HTML file: jobs.html
     }
 
     @GetMapping("/jobs/{id}")
     public String viewJobDetail(@PathVariable Long id, Model model) {
-        Optional<Job> jobOpt = jobRepo.findById(id);
-        if (jobOpt.isEmpty()) {
-            return "redirect:/view/jobs"; // or a 404 page
-        }
-
-        model.addAttribute("job", jobOpt.get());
-        return "job-detail"; // maps to job-detail.html
+        Job job = jobRepo.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid job ID: " + id));
+        model.addAttribute("job", job);
+        return "job-detail";
     }
 
-    @GetMapping("/view/scheduler")
-    public String viewScheduler(@RequestParam(required = false)
-                                @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-                                LocalDate date,
-                                Model model) {
-        LocalDate selectedDate = (date != null) ? date : LocalDate.now();
-        List<Job> allJobs = jobRepo.findAll();
+    @GetMapping("/services")
+    public String viewServices(Model model) {
+        List<ServiceEntry> allServices = serviceRepo.findAll(Sort.by(Sort.Direction.DESC, "date"));
 
-        List<ServiceEntry> servicesForDate = serviceRepo.findAll().stream()
-                .filter(s -> selectedDate.equals(s.getDate()))
-                .collect(Collectors.toList());
+        Map<LocalDate, List<ServiceEntry>> grouped = allServices.stream()
+                .collect(Collectors.groupingBy(ServiceEntry::getDate, LinkedHashMap::new, Collectors.toList()));
 
-        model.addAttribute("selectedDate", selectedDate);
-        model.addAttribute("services", servicesForDate);
-        model.addAttribute("currentPage", "scheduler");
-        model.addAttribute("allJobs", allJobs);
-
-        return "scheduler";
+        model.addAttribute("groupedServices", grouped);
+        return "services";
     }
 
-    @PostMapping("/services/add")
-    public String addService(@RequestParam Long jobId,
-                             @RequestParam String crew,
-                             @RequestParam String workPerformed,
-                             @RequestParam String need,
-                             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
-
-        Job job = jobRepo.findById(jobId).orElse(null);
-        if (job == null) {
-            // Handle error (redirect with error message or log it)
-            return "redirect:/view/scheduler?date=" + new SimpleDateFormat("yyyy-MM-dd").format(date);
-        }
-
-        LocalDate localDate = date.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate();
-        ServiceEntry service = new ServiceEntry();
-        service.setJob(job);
-        service.setCrew(crew);
-        service.setWorkPerformed(workPerformed);
-        service.setNeed(need);
-        service.setDate(localDate);
-        serviceRepo.save(service);
-
-        String formatted = new SimpleDateFormat("yyyy-MM-dd").format(date);
-        return "redirect:/view/scheduler?date=" + formatted;
+    @GetMapping("/services/{id}")
+    public String viewServiceDetail(@PathVariable Long id, Model model) {
+        ServiceEntry service = serviceRepo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid service ID: " + id));
+        model.addAttribute("service", service);
+        return "service-detail";
     }
 
-    @PostMapping("/services/update")
-    public String updateService(@RequestParam Long id,
-                                @RequestParam String date,
-                                @RequestParam String crew,
-                                @RequestParam String workPerformed,
-                                @RequestParam String need) {
-
-        Optional<ServiceEntry> optional = serviceRepo.findById(id);
-        if (optional.isPresent()) {
-            ServiceEntry service = optional.get();
-            service.setCrew(crew);
-            service.setWorkPerformed(workPerformed);
-            service.setNeed(need);
-            serviceRepo.save(service);
-        }
-
-        // Redirect back to scheduler with same date if you want
-        return "redirect:/view/scheduler?date=" + date;
-    }
-
-    @PostMapping("/services/delete")
-    public String deleteService(@RequestParam Long id,
-                                @RequestParam String date) {
-        serviceRepo.deleteById(id);
-        return "redirect:/view/scheduler?date=" + date;
-    }
 }
