@@ -1,29 +1,22 @@
 package org.example.jobtrackerspring.model;
 
-import jakarta.persistence.*;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.Serializable;
 
-@Entity
 public class Customer {
-    @Id @GeneratedValue
-    private Long id;
     private String name;
     private String business;
     private String phone;
     private String email;
     private String address;
 
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
-    private List<Job> jobs = new ArrayList<>();
-
-    public void setId(Long id) {
-        this.id = id;
+    public String getName() {
+        return name;
     }
 
-    public Long getId() {
-        return id;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getBusiness() {
@@ -32,14 +25,6 @@ public class Customer {
 
     public void setBusiness(String business) {
         this.business = business;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getPhone() {
@@ -64,13 +49,5 @@ public class Customer {
 
     public void setAddress(String address) {
         this.address = address;
-    }
-
-    public List<Job> getJobs() {
-        return jobs;
-    }
-
-    public void setJobs(List<Job> jobs) {
-        this.jobs = jobs;
     }
 }

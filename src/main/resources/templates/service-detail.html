@@ -8,9 +8,8 @@
 <body>
 
 <nav style="margin-bottom: 20px;">
-    <a href="/view/customers">Customers</a> |
-    <a href="/view/jobs">Jobs</a> |
-    <a href="/view/services">Services</a>
+    <a href="/view/jobs">All Jobs</a> |
+    <a href="/view/services">Scheduler</a>
 
     <br><a th:text="${service.job.customer.name}" th:href="@{/view/customers/{id}(id=${service.job.customer.id})}"></a> →
     <a th:text="${service.job.lossType}" th:href="@{/view/jobs/{id}(id=${service.job.id})}"></a> →

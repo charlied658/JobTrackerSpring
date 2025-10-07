@@ -2,34 +2,97 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>All Jobs</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <title>Jobs</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<div class="container">
-    <nav style="margin-bottom: 20px;">
-        <a href="/view/customers">Customers</a> |
-        <span style="color: gray;">Jobs</span> |
-        <a href="/view/services">Services</a>
+<header>
+    <nav>
+        <a class="nav-link active">📋 Jobs</a>
+        <a class="nav-link" href="/view/services">🗓️ Services</a>
     </nav>
+</header>
 
-    <div th:if="${jobs.isEmpty()}">
-        <p>No jobs found.</p>
+<div class="container">
+    <h1>All Jobs</h1>
+
+    <!-- Search bar -->
+    <form method="get" action="/view/jobs" class="search-bar">
+        <input type="text" name="search" th:value="${searchQuery}" placeholder="Search by customer name..." />
+        <button type="submit">Search</button>
+    </form>
+
+    <!-- Add Job Button -->
+    <div class="add-box" id="openAddJobModal">
+        <span>Add Job</span>
+        <div class="plus-circle">+</div>
     </div>
 
+    <!-- Job List -->
     <div class="job-list">
-        <section class="job-box" th:each="job : ${jobs}">
-            <a th:href="@{/view/jobs/{id}(id=${job.id})}" class="box-link">
-                <div class = "clickable-box">
-                    <h2 th:text="${job.lossType}">Job Description</h2>
-                    <p><strong>Customer:</strong> <span th:text="${job.customer.name}"></span></p>
-                    <p><strong>Status:</strong> <span th:text="${job.status}"></span></p>
-                    <p><strong>Last Service Date:</strong> <span th:text="${job.latestServiceDate}"></span></p>
+        <div th:each="job : ${jobs}">
+             <a class="clickable-box"
+                 th:classappend="${' loss-' + #strings.toLowerCase(job.lossType)}"
+                 th:href="@{/view/jobs/{id}(id=${job.id})}">
+                <div class="job-header">
+                    <h2 th:text="${job.customer.name}">Customer Name</h2>
+                    <span th:text="${job.lossType}">Loss Type</span>
+                    <span class="status" th:text="${job.status}">Status</span>
                 </div>
-            </a>
-        </section>
+                <p th:text="${job.description}">Job Description</p>
+                <small th:text="${#temporals.format(job.latestServiceDate, 'yyyy-MM-dd')}">Last Service</small>
+             </a>
+        </div>
     </div>
-
 </div>
+
+<!-- Modal: Add Job -->
+<div id="addJobModalOverlay" class="modal-overlay">
+    <div class="modal">
+        <h2>Add Job</h2>
+        <form th:action="@{/view/jobs/add}" method="post">
+            <label>Name:</label>
+            <input type="text" name="customer.name" required />
+
+            <label>Business:</label>
+            <input type="text" name="customer.business" />
+
+            <label>Phone:</label>
+            <input type="text" name="customer.phone" />
+
+            <label>Email:</label>
+            <input type="email" name="customer.email" />
+
+            <label>Address:</label>
+            <input type="text" name="customer.address" />
+
+            <label>Loss Type:</label>
+            <select name="lossType" required>
+                <option value="Water">Water</option>
+                <option value="Fire">Fire</option>
+                <option value="Sewage">Sewage</option>
+                <option value="Cleaning">Cleaning</option>
+                <option value="Mold">Mold</option>
+                <option value="Biohazard">Biohazard</option>
+                <option value="Recon">Recon</option>
+            </select>
+
+            <label>Description:</label>
+            <textarea name="description" rows="3"></textarea>
+
+            <div class="modal-buttons">
+                <button type="submit" class="save-btn">Save</button>
+                <button type="button" class="close-btn" id="closeAddJobModal">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const modal = document.getElementById("addJobModalOverlay");
+    document.getElementById("openAddJobModal").onclick = () => modal.style.display = "flex";
+    document.getElementById("closeAddJobModal").onclick = () => modal.style.display = "none";
+    window.onclick = (e) => { if (e.target === modal) modal.style.display = "none"; };
+</script>
 </body>
 </html>

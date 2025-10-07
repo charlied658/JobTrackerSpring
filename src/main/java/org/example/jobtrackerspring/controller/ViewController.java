@@ -1,24 +1,16 @@
 package org.example.jobtrackerspring.controller;
 
-import org.example.jobtrackerspring.model.Customer;
 import org.example.jobtrackerspring.model.Job;
+import org.example.jobtrackerspring.model.ServiceDisplay;
 import org.example.jobtrackerspring.model.ServiceEntry;
-import org.example.jobtrackerspring.repository.CustomerRepository;
 import org.example.jobtrackerspring.repository.JobRepository;
-import org.example.jobtrackerspring.repository.ServiceEntryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-
+import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -26,66 +18,115 @@ import java.util.stream.Collectors;
 public class ViewController {
 
     @Autowired
-    private CustomerRepository customerRepo;
-
-    @Autowired
     private JobRepository jobRepo;
 
-    @Autowired
-    private ServiceEntryRepository serviceRepo;
-
-    // 📋 View all customers as a simple list with search
-    @GetMapping("/customers")
-    public String viewCustomers(Model model) {
-        List<Customer> customers = customerRepo.findAll();
-        model.addAttribute("customers", customers);
-        return "customers"; // thymeleaf template: customer_list.html
-    }
-
-    @GetMapping("/customers/{id}")
-    public String viewCustomerDetails(@PathVariable Long id, Model model) {
-        Optional<Customer> customerOpt = customerRepo.findById(id);
-        if (customerOpt.isPresent()) {
-            Customer customer = customerOpt.get();
-            model.addAttribute("customer", customer);
-            model.addAttribute("jobs", jobRepo.findByCustomer(customer));
-            return "customer-detail";  // This will be the name of the new HTML file
-        } else {
-            return "redirect:/view/customers"; // Fallback if not found
-        }
-    }
-
+    // === All Jobs Page ===
     @GetMapping("/jobs")
-    public String viewJobs(Model model) {
+    public String listJobs(Model model) {
         List<Job> jobs = jobRepo.findAll();
+        // Optionally sort by latest service date:
+        jobs.sort((a, b) -> {
+            LocalDate adate = a.getServices().isEmpty() ? LocalDate.MIN
+                    : a.getServices().get(a.getServices().size() - 1).getDate();
+            LocalDate bdate = b.getServices().isEmpty() ? LocalDate.MIN
+                    : b.getServices().get(b.getServices().size() - 1).getDate();
+            return bdate.compareTo(adate);
+        });
         model.addAttribute("jobs", jobs);
-        return "jobs"; // This matches the name of the HTML file: jobs.html
+        return "jobs";
     }
 
+
+    // === Job Detail Page ===
     @GetMapping("/jobs/{id}")
-    public String viewJobDetail(@PathVariable Long id, Model model) {
-        Job job = jobRepo.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid job ID: " + id));
+    public String viewJobDetails(@PathVariable String id, Model model) {
+        Job job = jobRepo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Job not found: " + id));
         model.addAttribute("job", job);
+        model.addAttribute("services", job.getServices()); // no separate lookup needed
         return "job-detail";
     }
 
     @GetMapping("/services")
-    public String viewServices(Model model) {
-        List<ServiceEntry> allServices = serviceRepo.findAll(Sort.by(Sort.Direction.DESC, "date"));
+    public String viewServices(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            Model model
+    ) {
+        if (date == null) {
+            date = LocalDate.now();
+        }
 
-        Map<LocalDate, List<ServiceEntry>> grouped = allServices.stream()
-                .collect(Collectors.groupingBy(ServiceEntry::getDate, LinkedHashMap::new, Collectors.toList()));
+        LocalDate finalDate = date;
 
-        model.addAttribute("groupedServices", grouped);
+        List<Job> allJobs = jobRepo.findAll();
+
+        // Flatten services from all jobs, attaching job info
+        List<ServiceDisplay> servicesForDate = allJobs.stream()
+                .flatMap(job -> job.getServices().stream()
+                        .filter(s -> finalDate.equals(s.getDate()))
+                        .map(s -> new ServiceDisplay(job.getId(), job.getCustomer().getName(), s)))
+                .collect(Collectors.toList());
+
+        model.addAttribute("date", date);
+        model.addAttribute("previousDate", date.minusDays(1));
+        model.addAttribute("nextDate", date.plusDays(1));
+        model.addAttribute("services", servicesForDate);
         return "services";
     }
 
-    @GetMapping("/services/{id}")
-    public String viewServiceDetail(@PathVariable Long id, Model model) {
-        ServiceEntry service = serviceRepo.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid service ID: " + id));
-        model.addAttribute("service", service);
-        return "service-detail";
+    // === Add Job (Modal Form) ===
+    @PostMapping("/jobs/add")
+    public String addJob(@ModelAttribute Job job) {
+        jobRepo.save(job);
+        return "redirect:/view/jobs";
     }
 
+    // === Add Service to Job ===
+    @PostMapping("/jobs/{id}/addService")
+    public String addService(@PathVariable String id, @ModelAttribute ServiceEntry service) {
+        Job job = jobRepo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Job not found: " + id));
+
+        job.getServices().add(service);
+        jobRepo.save(job); // stores updated embedded list
+
+        return "redirect:/view/jobs/" + id;
+    }
+
+    @PostMapping("/services/edit")
+    public String editService(
+            @PathVariable String jobId,
+            @PathVariable int index,
+            @ModelAttribute ServiceEntry updatedService
+    ) {
+        Job job = jobRepo.findById(jobId)
+                .orElseThrow(() -> new IllegalArgumentException("Job not found: " + jobId));
+
+        if (index < 0 || index >= job.getServices().size()) {
+            throw new IllegalArgumentException("Invalid service index for job " + jobId);
+        }
+
+        // Replace the old service entry with the new one
+        job.getServices().set(index, updatedService);
+        jobRepo.save(job);
+
+        return "redirect:/view/jobs/" + jobId;
+    }
+
+    // === Edit Job ===
+    @PostMapping("/jobs/edit")
+    public String editJob(@ModelAttribute Job updatedJob) {
+        Job existingJob = jobRepo.findById(updatedJob.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Job not found: " + updatedJob.getId()));
+        updatedJob.setServices(existingJob.getServices());
+        jobRepo.save(updatedJob); // MongoDB auto-replaces matching ID
+        return "redirect:/view/jobs/" + updatedJob.getId();
+    }
+
+    // === Delete Job ===
+    @PostMapping("/jobs/{id}/delete")
+    public String deleteJob(@PathVariable String id) {
+        jobRepo.deleteById(id);
+        return "redirect:/view/jobs";
+    }
 }

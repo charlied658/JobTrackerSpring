@@ -1,29 +1,55 @@
 package org.example.jobtrackerspring.model;
 
 import jakarta.persistence.*;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
 
-@Entity
 public class ServiceEntry {
-    @Id @GeneratedValue
-    private Long id;
+    @Id
+    private String id;
     private LocalDate date;
     private String crew;
-    private String serviceType;
-    private String instructions;
+    private String status;
+    private String notes;
     private String workPerformed;
     private String need;
 
-    @ManyToOne
+    private String jobId;
+
+    @Transient
     private Job job;
 
-    public Long getId() {
+    public Job getJob() {
+        return job;
+    }
+
+    public void setJob(Job job) {
+        this.job = job;
+    }
+
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
+    }
+
+    public String getJobId() {
+        return jobId;
+    }
+
+    public void setJobId(String jobId) {
+        this.jobId = jobId;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public LocalDate getDate() {
@@ -42,20 +68,12 @@ public class ServiceEntry {
         this.crew = crew;
     }
 
-    public String getServiceType() {
-        return serviceType;
+    public String getNotes() {
+        return notes;
     }
 
-    public void setServiceType(String serviceType) {
-        this.serviceType = serviceType;
-    }
-
-    public String getInstructions() {
-        return instructions;
-    }
-
-    public void setInstructions(String instructions) {
-        this.instructions = instructions;
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 
     public String getWorkPerformed() {
@@ -72,13 +90,5 @@ public class ServiceEntry {
 
     public void setNeed(String need) {
         this.need = need;
-    }
-
-    public Job getJob() {
-        return job;
-    }
-
-    public void setJob(Job job) {
-        this.job = job;
     }
 }

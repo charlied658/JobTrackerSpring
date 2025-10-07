@@ -1,52 +1,60 @@
 package org.example.jobtrackerspring.controller;
 
-import org.example.jobtrackerspring.model.Customer;
 import org.example.jobtrackerspring.model.Job;
-import org.example.jobtrackerspring.repository.CustomerRepository;
+import org.example.jobtrackerspring.model.ServiceEntry;
 import org.example.jobtrackerspring.repository.JobRepository;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import java.util.List;
+import java.util.Optional;
 
-@Controller
+@RestController
+@RequestMapping("/api/jobs")
 public class JobController {
-
-    @Autowired
-    private CustomerRepository customerRepo;
 
     @Autowired
     private JobRepository jobRepo;
 
-    @PostMapping("/jobs/add")
-    public String addJob(@RequestParam Long customerId,
-                         @RequestParam String lossType,
-                         @RequestParam(required = false) String description) {
-        Customer customer = customerRepo.findById(customerId).orElseThrow();
-        Job job = new Job();
-        job.setCustomer(customer);
-        job.setLossType(lossType);
-        job.setDescription(description);
-        job.setStatus("Active");
-        job.setAddress(customer.getAddress());
-        jobRepo.save(job);
-        return "redirect:/view/customers/" + customerId;
+    @GetMapping
+    public List<Job> getAllJobs() {
+        return jobRepo.findAll();
     }
 
-    @PostMapping("/jobs/edit")
-    public String editJob(@RequestParam Long id,
-                          @RequestParam String lossType,
-                          @RequestParam String status,
-                          @RequestParam String address,
-                          @RequestParam String description) {
+    @GetMapping("/{id}")
+    public Optional<Job> getJobById(@PathVariable String id) {
+        return jobRepo.findById(id);
+    }
+
+    @PostMapping
+    public Job addJob(@RequestBody Job job) {
+        return jobRepo.save(job);
+    }
+
+    @PutMapping("/{id}")
+    public Job updateJob(@PathVariable String id, @RequestBody Job updated) {
+        return jobRepo.findById(id)
+                .map(job -> {
+                    job.getCustomer().setName(updated.getCustomer().getName());
+                    job.setStatus(updated.getStatus());
+                    job.setLossType(updated.getLossType());
+                    job.setServices(updated.getServices());
+                    return jobRepo.save(job);
+                })
+                .orElseGet(() -> {
+                    updated.setId(id);
+                    return jobRepo.save(updated);
+                });
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteJob(@PathVariable String id) {
+        jobRepo.deleteById(id);
+    }
+
+    @PatchMapping("/{id}/addService")
+    public Job addServiceToJob(@PathVariable String id, @RequestBody ServiceEntry newService) {
         Job job = jobRepo.findById(id).orElseThrow();
-
-        job.setLossType(lossType);
-        job.setStatus(status);
-        job.setAddress(address);
-        job.setDescription(description);
-        jobRepo.save(job);
-
-        return "redirect:/view/jobs/" + id;
+        job.getServices().add(newService);
+        return jobRepo.save(job);
     }
 }

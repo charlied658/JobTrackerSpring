@@ -2,41 +2,43 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>All Services</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <title>Services</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<div class="container">
-
-    <nav style="margin-bottom: 20px;">
-        <a href="/view/customers">Customers</a> |
-        <a href="/view/jobs">Jobs</a> |
-        <span style="color: gray;">Services</span>
+<header>
+    <nav>
+        <a class="nav-link" href="/view/jobs">📋 Jobs</a>
+        <a class="nav-link active">🗓️ Services</a>
     </nav>
+</header>
 
-    <div th:if="${groupedServices.isEmpty()}">
-        <p>No services found.</p>
+<div class="schedule-header">
+    <a th:href="@{/view/services(date=${#temporals.format(previousDate, 'yyyy-MM-dd')})}" class="nav-arrow">← Previous</a>
+    <h2 th:text="${#temporals.format(date, 'EEEE, MMM dd yyyy')}">Today</h2>
+    <a th:href="@{/view/services(date=${#temporals.format(nextDate, 'yyyy-MM-dd')})}" class="nav-arrow">Next →</a>
+
+</div>
+
+<div class="date-selector">
+    <form th:action="@{/view/services}" method="get">
+        <input type="date" name="date" th:value="${currentDate}" />
+        <button type="submit">Go</button>
+    </form>
+</div>
+
+<div class="service-grid">
+    <div th:each="s : ${services}">
+        <a class="service-tile"
+           th:href="@{'/view/jobs/' + ${s.jobId}}">
+            <h3 th:text="${s.jobName}">Customer</h3>
+            <p th:text="${s.service.workPerformed}">Work</p>
+            <small th:text="${s.service.need}">Need</small>
+        </a>
     </div>
-
-    <div th:each="entry : ${groupedServices}">
-        <h2 th:text="${#temporals.format(entry.key, 'MMMM d, yyyy')}">Date</h2>
-        <div class="service-list">
-            <section class="service-box" th:each="service : ${entry.value}">
-                <a th:href="@{/view/services/{id}(id=${service.id})}" class="box-link">
-                    <div class = "clickable-box">
-                        <p><strong>Customer:</strong> <span th:text="${service.job.customer.name}">Customer</span></p>
-                        <p><strong>Loss Type:</strong> <span th:text="${service.job.lossType}"></span></p>
-                        <p><strong>Service Type:</strong> <span th:text="${service.serviceType}"></span></p>
-                        <p><strong>Crew:</strong> <span th:text="${service.crew}">Crew</span></p>
-                        <p><strong>Instructions:</strong> <span th:text="${service.instructions}"></span></p>
-                        <p><strong>Work Performed:</strong> <span th:text="${service.workPerformed}">Work</span></p>
-                        <p><strong>Need:</strong> <span th:text="${service.need}">Need</span></p>
-                    </div>
-                </a>
-            </section>
-        </div>
+    <div th:if="${#lists.isEmpty(services)}" class="no-services">
+        <p>No services for this day.</p>
     </div>
-
 </div>
 </body>
 </html>

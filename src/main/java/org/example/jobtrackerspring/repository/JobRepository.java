@@ -1,11 +1,10 @@
 package org.example.jobtrackerspring.repository;
 
-import org.example.jobtrackerspring.model.Customer;
 import org.example.jobtrackerspring.model.Job;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
 
-public interface JobRepository extends JpaRepository<Job, Long> {
-    List<Job> findByCustomer(Customer customer);
+public interface JobRepository extends MongoRepository<Job, String> {
+    List<Job> findByCustomerName(String name);
 }
